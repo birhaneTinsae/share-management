@@ -1,0 +1,23 @@
+
+spring:
+  application:
+    name: "Share Management System"
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/share_management
+    username: root
+    password: Pas@12345
+jwt:
+  secret: ${SECRET_KEY}
+application:
+  allowedOrigin:
+    - 'http://196.189.90.121:71'
+    - 'http://localhost:4200'
+  shareValue: 1000
+storage:
+  location: ""
+
+

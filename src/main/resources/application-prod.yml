@@ -1,0 +1,23 @@
+
+spring:
+  config:
+    use-legacy-processing: true
+  application:
+    name: "Share Management System"
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: "jdbc:postgresql://172.17.0.1:5432/share_management"
+#    url: "jdbc:postgresql://196.189.90.121:5432/share_management"
+    username: share
+    password: Pas@12345
+jwt:
+  secret: ${SECRET_KEY}
+application:
+  allowedOrigin:
+    - 'http://196.189.90.121:9091'
+    - 'http://localhost:4200'
+storage:
+  location: ""
