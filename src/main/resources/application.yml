@@ -7,8 +7,8 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/share_management
-    username: root
+    url: jdbc:mysql://${MYSQL_HOST:10.1.12.110}:3306/share_management
+    username: atmuser
     password: Pas@12345
 jwt:
   secret: ${SECRET_KEY}

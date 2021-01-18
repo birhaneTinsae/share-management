@@ -58,6 +58,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiError(CONFLICT, ex.getMessage(), ex));
     }
 
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return buildResponseEntity(new ApiError(BAD_REQUEST, ex.getMessage(), ex));
+    }
+
     @ResponseStatus(CONFLICT)
     @ExceptionHandler(EntityExistsException.class)
     protected ResponseEntity<Object> handleEntityExistException(EntityExistsException ex) {

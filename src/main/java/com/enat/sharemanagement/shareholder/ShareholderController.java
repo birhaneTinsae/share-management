@@ -8,6 +8,7 @@ import com.enat.sharemanagement.utils.PaginatedResultsRetrievedEvent;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,7 @@ import static com.enat.sharemanagement.utils.Util.mapList;
 @RestController
 @RequestMapping("/shareholders")
 @RequiredArgsConstructor
+@Log4j2
 public class ShareholderController implements Common<ShareholderDTO, ShareholderDTO, Long> {
     private final ShareholderService service;
     private final ModelMapper modelMapper;
@@ -43,12 +45,15 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
 
     @Override
     public ShareholderDTO store(@Valid ShareholderDTO shareholderDTO) {
+        log.info("Create new shareholder");
         if (Period.between(shareholderDTO.getDob(), LocalDate.now()).getYears() < 18 && shareholderDTO.getGuardian() == null) {
             throw new IllegalArgumentException("Shareholder below age of 18 should have guardian");
         }
         Shareholder shareholder = dtoMapper(shareholderDTO, Shareholder.class, modelMapper);
-        List<Guardian> guardians = mapList(shareholderDTO.getGuardian(), Guardian.class, modelMapper);
-        shareholder.setGuardian(guardians);
+        if (shareholderDTO.getGuardian() != null) {
+            List<Guardian> guardians = mapList(shareholderDTO.getGuardian(), Guardian.class, modelMapper);
+            shareholder.setGuardian(guardians);
+        }
         return getShareholderDTO(service.store(shareholder));
     }
 
@@ -82,7 +87,7 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
             , final HttpServletResponse response) {
         eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<>(
                 ShareholderDTO.class, uriBuilder, response, pageable.getPageNumber(), service.getAll(pageable).getTotalPages(), pageable.getPageSize()));
-        return new ResponseEntity<PagedModel<ShareholderDTO>>(assembler.toModel(service.getAll(pageable).map(this::getShareholderDTO )), HttpStatus.OK);
+        return new ResponseEntity<PagedModel<ShareholderDTO>>(assembler.toModel(service.getAll(pageable).map(this::getShareholderDTO)), HttpStatus.OK);
 
     }
 
@@ -104,9 +109,12 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
 //
 //    }
 
-    public ShareholderDTO getShareholderDTO(Shareholder shareholder){
+    public ShareholderDTO getShareholderDTO(Shareholder shareholder) {
         ShareholderDTO shareholderDTO = dtoMapper(shareholder, ShareholderDTO.class, modelMapper);
-        shareholderDTO.setGuardian(mapList(shareholder.getGuardian(), GuardianDTO.class, modelMapper));
+        if (shareholder.getGuardian() != null) {
+            shareholderDTO.setGuardian(mapList(shareholder.getGuardian(), GuardianDTO.class, modelMapper));
+        }
+
         return shareholderDTO;
     }
 }
