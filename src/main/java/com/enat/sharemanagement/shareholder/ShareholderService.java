@@ -23,10 +23,15 @@ public class ShareholderService implements Common<Shareholder, Shareholder, Long
 
     @Override
     public Shareholder store(@Valid Shareholder shareholder) {
-        shareholder = repository.save(shareholder);
-        @Valid Shareholder finalShareholder = shareholder;
-        shareholder.getGuardian().forEach(guardian -> guardian.setShareholder(finalShareholder));
-        guardianRepository.saveAll(shareholder.getGuardian());
+        if (shareholder.getGuardian()!=null) {
+
+            shareholder = repository.save(shareholder);
+            @Valid Shareholder finalShareholder = shareholder;
+
+            shareholder.getGuardian().forEach(guardian -> guardian.setShareholder(finalShareholder));
+            guardianRepository.saveAll(shareholder.getGuardian());
+            return repository.save(shareholder);
+        }
         return repository.save(shareholder);
     }
 
