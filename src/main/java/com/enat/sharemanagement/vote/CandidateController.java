@@ -73,7 +73,7 @@ public class CandidateController implements Common<CandidateDTO, CandidateDTO, L
 
     @Override
     public Iterable<CandidateDTO> getAll(Pageable pageable) {
-        return null;
+      throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @PutMapping("/vote/{shareholderId}")
