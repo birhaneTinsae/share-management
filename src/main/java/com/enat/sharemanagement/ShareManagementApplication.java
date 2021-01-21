@@ -1,9 +1,8 @@
 package com.enat.sharemanagement;
 
-import antlr.BaseAST;
 import com.enat.sharemanagement.storage.StorageProperties;
-import com.enat.sharemanagement.user.User;
-import com.enat.sharemanagement.user.UserRepository;
+import com.enat.sharemanagement.security.user.User;
+import com.enat.sharemanagement.security.user.UserRepository;
 import com.enat.sharemanagement.utils.ApplicationProps;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
@@ -17,7 +16,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;

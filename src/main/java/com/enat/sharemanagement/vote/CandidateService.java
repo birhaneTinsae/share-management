@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class CandidateService implements Common<Candidate, Candidate, Long> {
 
     @Override
     public Candidate store(@Valid Candidate candidate) {
+        candidate.setTotalVotes(BigDecimal.ZERO);
         return repository.save(candidate);
     }
 
@@ -59,16 +61,12 @@ public class CandidateService implements Common<Candidate, Candidate, Long> {
     }
 
     public boolean vote(long id, List<Candidate> candidates) {
-        Attendance sh = attendanceService.show(id);
-        if (sh.isAttend() && !sh.isVoted()) {
-//            Set<Candidate> candidateList = Arrays.stream(candidates).mapToObj(this::show)
-//                    .collect(Collectors.toSet());
-
-
-            candidates.forEach(c -> c.setTotalVotes(c.getTotalVotes().add(sh.getNoOfShares())));
-            sh.setCandidates(candidates);
-            sh.setVoted(true);
-            attendanceService.update(sh.getId(), sh);
+        Attendance attendance = attendanceService.show(id);
+        if (attendance.isAttend() && !attendance.isVoted()) {
+            candidates.forEach(c -> c.setTotalVotes(c.getTotalVotes().add(attendance.getNoOfShares())));
+            attendance.setCandidates(candidates);
+            attendance.setVoted(true);
+            attendanceService.update(attendance.getId(), attendance);
             return true;
         }
 
@@ -84,7 +82,7 @@ public class CandidateService implements Common<Candidate, Candidate, Long> {
             attendance.setVoted(false);
             return true;
         }
-        return false;
+        throw new IllegalStateException("Shareholder not attend or already voted,");
     }
 
     public Page<Candidate> getVoteByUser(Pageable pageable, Principal principal) {

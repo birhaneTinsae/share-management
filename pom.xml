@@ -230,18 +230,19 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <image>
-                        <name>https://hub.docker.com/u/btinsae/${project.artifactId}</name>
-                        <publish>true</publish>
-                    </image>
-                    <docker>
-                        <publishRegistry>
-                            <username>btinsae</username>
-                            <password>Pas@12345</password>
-                            <url>https://hub.docker.com</url>
-                            <email>birhane.tinsaa@gmail.com</email>
-                        </publishRegistry>
-                    </docker>
+<!--                    <image>-->
+<!--                        <name>https://docker.io/btinsae/share_management/${project.artifactId}</name>-->
+<!--                        <publish>true</publish>-->
+<!--                    </image>-->
+
+<!--                    <docker>-->
+<!--                        <publishRegistry>-->
+<!--                            <username>btinsae</username>-->
+<!--                            <password>Pas@12345</password>-->
+<!--                            <url>https://hub.docker.com</url>-->
+<!--                            <email>birhane.tinsaa@gmail.com</email>-->
+<!--                        </publishRegistry>-->
+<!--                    </docker>-->
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

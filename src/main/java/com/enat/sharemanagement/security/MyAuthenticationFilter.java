@@ -1,7 +1,7 @@
 package com.enat.sharemanagement.security;
 
 import com.enat.sharemanagement.exceptions.ApiError;
-import com.enat.sharemanagement.user.UserRepository;
+import com.enat.sharemanagement.security.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

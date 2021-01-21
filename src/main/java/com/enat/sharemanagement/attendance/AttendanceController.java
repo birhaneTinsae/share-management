@@ -1,13 +1,14 @@
 package com.enat.sharemanagement.attendance;
 
-import com.enat.sharemanagement.shareholder.ShareholderDTO;
 import com.enat.sharemanagement.utils.Common;
 import com.enat.sharemanagement.utils.PaginatedResultsRetrievedEvent;
-import com.enat.sharemanagement.vote.MetricDto;
+import com.enat.sharemanagement.vote.AttendanceMetric;
+import com.enat.sharemanagement.vote.AttendanceMetricsDTO;
+import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.guieffect.qual.PolyUIType;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,42 +16,47 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.enat.sharemanagement.utils.Util.dtoMapper;
+import static com.enat.sharemanagement.utils.Util.mapList;
 
 @RestController
-@RequestMapping(value ="/attenance")
+@RequestMapping(value = "/attendance")
 @RequiredArgsConstructor
-public class AttendanceController implements Common<Attendance, Attendance, Long> {
+public class AttendanceController implements Common<Attendance, AttendanceDTO, Long> {
     private final AttendanceService attendanceService;
+    private final ModelMapper modelMapper;
 
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    public Attendance store(@Valid Attendance attendance) {
-        return attendanceService.store(attendance);
+    public AttendanceDTO store(@Valid Attendance attendance) {
+        return dtoMapper(attendanceService.store(attendance), AttendanceDTO.class, modelMapper);
     }
 
     @Override
-    public Iterable<Attendance> store(List<@Valid Attendance> t) {
-        return attendanceService.store(t);
+    public Iterable<AttendanceDTO> store(List<@Valid Attendance> t) {
+        List<Attendance> attendances = Lists.newArrayList(attendanceService.store(t));
+//                Lists.newArrayList(attendanceService.store(mapList(t, Promotion.class, modelMapper)));
+        return mapList(attendances, AttendanceDTO.class, modelMapper);
+//        return dtoMapper(attendanceService.store(t),AttendanceDTO.class,modelMapper);
     }
 
     @Override
-    public Attendance show(Long id) {
-        return attendanceService.show(id);
+    public AttendanceDTO show(Long id) {
+        return dtoMapper(attendanceService.show(id), AttendanceDTO.class, modelMapper);
     }
 
     @Override
-    public Attendance update(Long id, @Valid Attendance attendance) {
-        return attendanceService.update(id, attendance);
+    public AttendanceDTO update(Long id, @Valid Attendance attendance) {
+        return dtoMapper(attendanceService.update(id, attendance), AttendanceDTO.class, modelMapper);
     }
 
     @Override
@@ -60,36 +66,44 @@ public class AttendanceController implements Common<Attendance, Attendance, Long
 
 
     @GetMapping()
-    public ResponseEntity<PagedModel<Attendance>> getAll(@Parameter(description = "pagination object",
+    public ResponseEntity<PagedModel<AttendanceDTO>> getAll(@Parameter(description = "pagination object",
             schema = @Schema(implementation = Pageable.class))
-                                                             @Valid Pageable pageable
+                                                            @Valid Pageable pageable
             , PagedResourcesAssembler assembler
             , UriComponentsBuilder uriBuilder
 
             , final HttpServletResponse response) {
         eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<>(
-                Attendance.class, uriBuilder, response, pageable.getPageNumber(), attendanceService.getAll(pageable).getTotalPages(), pageable.getPageSize()));
-        return new ResponseEntity<PagedModel<Attendance>>(assembler.toModel(attendanceService.getAll(pageable)), HttpStatus.OK);
+                AttendanceDTO.class, uriBuilder, response, pageable.getPageNumber(), attendanceService.getAll(pageable).getTotalPages(), pageable.getPageSize()));
+        return new ResponseEntity<PagedModel<AttendanceDTO>>(assembler.toModel(attendanceService.getAll(pageable)), HttpStatus.OK);
 
     }
 
     @Override
-    public Page<Attendance> getAll(Pageable pageable) {
-        return attendanceService.getAll(pageable);
+    public Page<AttendanceDTO> getAll(Pageable pageable) {
+        return attendanceService.getAll(pageable).map(a -> dtoMapper(a, AttendanceDTO.class, modelMapper));
     }
 
     @PutMapping("/attend/{id}")
-    public Attendance takeAttendance(@PathVariable("id") long id) {
-        return attendanceService.takeAttendance(id);
+    public AttendanceDTO takeAttendance(@PathVariable("id") long id) {
+        return dtoMapper(attendanceService.takeAttendance(id), AttendanceDTO.class, modelMapper);
     }
 
     @PutMapping("/reverse/{id}")
-    public Attendance reverseAttendance(@PathVariable("id") long id) {
-        return attendanceService.reverseAttendance(id);
+    public AttendanceDTO reverseAttendance(@PathVariable("id") long id) {
+        return dtoMapper(attendanceService.reverseAttendance(id), AttendanceDTO.class, modelMapper);
+    }
+
+    @PostMapping("/create")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public boolean createAttendance(@RequestBody AttendanceDTO attendance){
+        return attendanceService.createAttendance(attendance);
     }
 
     @GetMapping("/metrics")
-    public MetricDto attendanceMetric() {
-        return attendanceService.attendanceMetric();
+    public AttendanceMetricsDTO attendanceMetric() {
+        return dtoMapper(attendanceService.attendanceMetric(),AttendanceMetricsDTO.class,modelMapper);
     }
+
+
 }

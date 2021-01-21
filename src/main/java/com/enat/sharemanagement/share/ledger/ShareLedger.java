@@ -1,7 +1,7 @@
 package com.enat.sharemanagement.share.ledger;
 
-import com.enat.sharemanagement.share.TransactionType;
-import com.enat.sharemanagement.share.TransactionTypeConverter;
+import com.enat.sharemanagement.transaction.TransactionType;
+import com.enat.sharemanagement.transaction.TransactionTypeConverter;
 import com.enat.sharemanagement.shareholder.Shareholder;
 import com.enat.sharemanagement.utils.Auditable;
 import lombok.Data;
@@ -19,7 +19,7 @@ public class ShareLedger extends Auditable {
     @Convert(converter = TransactionTypeConverter.class)
     private TransactionType transactionType;
     @ManyToOne
-    private Shareholder shareHolder;
+    private Shareholder shareholder;
     private BigDecimal amount;
     private LocalDateTime txnDate;
 

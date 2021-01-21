@@ -1,6 +1,6 @@
 package com.enat.sharemanagement.security;
 
-import com.enat.sharemanagement.user.UserRepository;
+import com.enat.sharemanagement.security.user.UserRepository;
 import com.enat.sharemanagement.utils.ApplicationProps;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
