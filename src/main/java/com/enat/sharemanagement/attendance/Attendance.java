@@ -1,5 +1,6 @@
 package com.enat.sharemanagement.attendance;
 
+import com.enat.sharemanagement.agenda.AgendaVote;
 import com.enat.sharemanagement.shareholder.Shareholder;
 import com.enat.sharemanagement.utils.Auditable;
 import com.enat.sharemanagement.vote.Candidate;
@@ -12,17 +13,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "attendance")
 @Data
 public class Attendance extends Auditable implements Serializable {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    //    private String firstName;
-//    private String middleName;
-//    private String lastName;
-//    private BigDecimal noOfShares;
     @OneToOne
     private Shareholder shareholder;
     private boolean attend;
@@ -37,6 +34,11 @@ public class Attendance extends Auditable implements Serializable {
     private List<Candidate> candidates;
     private String budgetYear;
     private BigDecimal noOfShares;
+    @ManyToOne
+    private Delegate delegate;
+
+    @OneToMany(mappedBy = "attendance")
+    Set<AgendaVote> attendance;
 
 
 }

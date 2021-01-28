@@ -22,7 +22,8 @@ public interface Common<T, Z,Y> {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/list", produces = {"application/json"})
-    Iterable<Z> store(@RequestBody List<@Valid T> t);
+    Iterable<Z>
+    store(@RequestBody List<@Valid T> t);
 
     @GetMapping(value = "/{id}", produces = {"application/json"})
     Z show(@PathVariable Y id);

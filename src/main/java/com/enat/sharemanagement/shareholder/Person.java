@@ -24,9 +24,11 @@ public abstract class Person extends Auditable {
     @Column(nullable = false)
     @NotNull(message = "Last Name cannot be null")
     private String lastName;
+    private String nationality;
     private String firstNameAmharic;
     private String middleNameAmharic;
     private String lastNameAmharic;
+    private String nationalityAmharic;
 
     @Embedded
     private Contact contact;

@@ -2,9 +2,7 @@ package com.enat.sharemanagement.shareholder;
 
 import com.enat.sharemanagement.guardian.Guardian;
 import com.enat.sharemanagement.guardian.GuardianDTO;
-import com.enat.sharemanagement.utils.BarCodeUtils;
-import com.enat.sharemanagement.utils.Common;
-import com.enat.sharemanagement.utils.PaginatedResultsRetrievedEvent;
+import com.enat.sharemanagement.utils.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +11,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
@@ -109,6 +106,21 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
 //
 //    }
 
+    @GetMapping("/search")
+    public ResponseEntity<PagedModel<ShareholderDTO>> search(@Parameter(description = "pagination object",
+            schema = @Schema(implementation = Pageable.class))
+                                                             @Valid Pageable pageable
+            , PagedResourcesAssembler assembler
+            , UriComponentsBuilder uriBuilder
+            , @RequestParam(value = "search") String searchQuery
+            , final HttpServletResponse response) {
+        Specification<Shareholder> spec = resolveSpecificationFromInfixExpr(searchQuery);
+        eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<>(
+                ShareholderDTO.class, uriBuilder, response, pageable.getPageNumber(), service.search(spec,pageable).getTotalPages(), pageable.getPageSize()));
+        return new ResponseEntity<PagedModel<ShareholderDTO>>(assembler.toModel(service.search(spec,pageable).map(this::getShareholderDTO)), HttpStatus.OK);
+
+    }
+
     public ShareholderDTO getShareholderDTO(Shareholder shareholder) {
         ShareholderDTO shareholderDTO = dtoMapper(shareholder, ShareholderDTO.class, modelMapper);
         if (shareholder.getGuardian() != null) {
@@ -116,5 +128,11 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
         }
 
         return shareholderDTO;
+    }
+
+    protected Specification<Shareholder> resolveSpecificationFromInfixExpr(String searchParameters) {
+        CriteriaParser parser = new CriteriaParser();
+        GenericSpecificationsBuilder<Shareholder> specBuilder = new GenericSpecificationsBuilder<>();
+        return specBuilder.build(parser.parse(searchParameters), ShareholderSpecification::new);
     }
 }

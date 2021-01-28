@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
@@ -62,5 +63,9 @@ public class ShareholderService implements Common<Shareholder, Shareholder, Long
     @Override
     public Page<Shareholder> getAll(Pageable pageable) {
         return repository.findAll(pageable);
+    }
+
+    public Page<Shareholder> search(Specification<Shareholder> spec,Pageable pageable) {
+        return repository.findAll(spec,pageable);
     }
 }
