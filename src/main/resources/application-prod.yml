@@ -9,8 +9,8 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: "jdbc:postgresql://172.17.0.1:5432/share_management"
-#    url: "jdbc:postgresql://196.189.90.121:5432/share_management"
+#    url: "jdbc:postgresql://172.17.0.1:5432/share_management"
+    url: "jdbc:postgresql://196.189.90.121:5432/share_management"
     username: share
     password: Pas@12345
 jwt:

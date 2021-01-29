@@ -17,6 +17,6 @@ public interface AgendaRepository extends PagingAndSortingRepository<Agenda,Long
    @Query("select new com.enat.sharemanagement.agenda.AgendaSummary(av.id.agendaId,a.title,(select count(vote) from agenda_vote where id.agendaId=av.id.agendaId and vote=1) ,(select count(vote) from agenda_vote where id.agendaId=av.id.agendaId and vote=0) ,(select count(vote) from agenda_vote where id.agendaId=av.id.agendaId and vote=2))" +
            " from agenda_vote as av" +
            " left join agendas as a on av.id.agendaId=a.id" +
-           " group by av.id.agendaId")
+           " group by av.id.agendaId,a.title")
     Optional<List<AgendaSummary>> getAgendaSummary();
 }

@@ -103,4 +103,5 @@ public class CandidateController implements Common<CandidateDTO, CandidateDTO, L
     public boolean reverseVote(@PathVariable int id) {
         return service.reverseVote(id);
     }
+
 }

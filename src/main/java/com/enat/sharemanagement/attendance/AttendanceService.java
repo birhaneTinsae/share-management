@@ -3,11 +3,15 @@ package com.enat.sharemanagement.attendance;
 import com.enat.sharemanagement.attendance.log.AttendanceLog;
 import com.enat.sharemanagement.attendance.log.AttendanceLogRepository;
 import com.enat.sharemanagement.exceptions.EntityNotFoundException;
+import com.enat.sharemanagement.report.SimpleReportExporter;
+import com.enat.sharemanagement.report.SimpleReportFiller;
 import com.enat.sharemanagement.shareholder.Shareholder;
 import com.enat.sharemanagement.shareholder.ShareholderRepository;
+import com.enat.sharemanagement.utils.ApplicationProps;
 import com.enat.sharemanagement.utils.Common;
 import com.enat.sharemanagement.vote.*;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.enat.sharemanagement.utils.Util.getNullPropertyNames;
@@ -28,6 +34,9 @@ public class AttendanceService implements Common<Attendance, Attendance, Long> {
     private final AttendanceLogRepository attendanceLogRepository;
     private final CandidateLogRepository candidateLogRepository;
     private final CandidateRepository candidateRepository;
+    private final SimpleReportFiller reportFiller;
+    private final SimpleReportExporter reportExporter;
+    private final ApplicationProps applicationProps;
 
     @Override
     public Attendance store(@Valid Attendance attendance) {
@@ -113,5 +122,15 @@ public class AttendanceService implements Common<Attendance, Attendance, Long> {
 
         }
         return true;
+    }
+
+    public JasperPrint exportReport(boolean attend, String format) {
+        reportFiller.setReportFileName("Attendance.jrxml");
+        reportFiller.compileReport();
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("ATTEND", attend);
+        reportFiller.setParameters(parameters);
+        reportFiller.fillReport();
+        return reportFiller.getJasperPrint();
     }
 }

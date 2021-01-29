@@ -12,7 +12,5 @@ import java.util.List;
 public class ApplicationProps {
 
     private List<String> allowedOrigin;
-
-    // getter and setter
-
+    private String author;
 }

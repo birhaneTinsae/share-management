@@ -3,8 +3,12 @@ package com.enat.sharemanagement.vote;
 import com.enat.sharemanagement.attendance.Attendance;
 import com.enat.sharemanagement.attendance.AttendanceService;
 import com.enat.sharemanagement.exceptions.EntityNotFoundException;
+import com.enat.sharemanagement.report.SimpleReportExporter;
+import com.enat.sharemanagement.report.SimpleReportFiller;
+import com.enat.sharemanagement.utils.ApplicationProps;
 import com.enat.sharemanagement.utils.Common;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JasperPrint;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.enat.sharemanagement.utils.Util.getNullPropertyNames;
@@ -22,6 +27,9 @@ import static com.enat.sharemanagement.utils.Util.getNullPropertyNames;
 public class CandidateService implements Common<Candidate, Candidate, Long> {
     private final CandidateRepository repository;
     private final AttendanceService attendanceService;
+    private final SimpleReportFiller reportFiller;
+    private final SimpleReportExporter reportExporter;
+    private final ApplicationProps applicationProps;
 
     @Override
     public Candidate store(@Valid Candidate candidate) {
@@ -87,5 +95,16 @@ public class CandidateService implements Common<Candidate, Candidate, Long> {
 
     public Page<Candidate> getVoteByUser(Pageable pageable, Principal principal) {
         return repository.findAllByCreatedBy(pageable, principal.getName());
+    }
+
+    public JasperPrint exportReport(int noOfSelects, int reserve, String format){
+        reportFiller.setReportFileName("Candidates.jrxml");
+        reportFiller.compileReport();
+        HashMap<String,Object> parameters = new HashMap<>();
+        parameters.put("RESERVE",reserve);
+        parameters.put("NO_OF_SELECTE",noOfSelects);
+        reportFiller.setParameters(parameters);
+        reportFiller.fillReport();
+        return reportFiller.getJasperPrint();
     }
 }
