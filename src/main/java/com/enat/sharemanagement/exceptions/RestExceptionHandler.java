@@ -79,7 +79,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(NOT_ACCEPTABLE)
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
-        return buildResponseEntity(new ApiError(CONFLICT, ex.getMessage(), ex));
+        return buildResponseEntity(new ApiError(NOT_ACCEPTABLE, ex.getMessage(), ex));
     }
 
 

@@ -35,7 +35,7 @@ public class ReportController {
     }
 
     @RequestMapping(value="/attendance",produces= MediaType.APPLICATION_PDF_VALUE)
-    public void attendancePDFReport(HttpServletResponse response,@RequestParam boolean attend,@RequestParam String format){
+    public void attendancePDFReport(HttpServletResponse response,@RequestParam boolean attend,@RequestParam(required=false) String format){
         try (OutputStream outputStream = response.getOutputStream()) {
             response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "inline; filename=".concat("attendance.pdf"));
