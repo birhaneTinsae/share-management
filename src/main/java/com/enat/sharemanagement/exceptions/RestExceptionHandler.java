@@ -7,6 +7,7 @@ package com.enat.sharemanagement.exceptions;
 
 import com.enat.sharemanagement.storage.StorageException;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -81,7 +82,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
         return buildResponseEntity(new ApiError(NOT_ACCEPTABLE, ex.getMessage(), ex));
     }
-
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(MalformedJwtException.class)
+    protected ResponseEntity<Object> handleMalformedJwtException(MalformedJwtException ex) {
+        return buildResponseEntity(new ApiError(NOT_ACCEPTABLE, ex.getMessage(), ex));
+    }
 
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(InsufficientBalanceException.class)

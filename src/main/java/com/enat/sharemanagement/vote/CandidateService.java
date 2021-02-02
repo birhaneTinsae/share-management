@@ -13,12 +13,14 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.enat.sharemanagement.utils.Util.getNullPropertyNames;
 
@@ -68,10 +70,12 @@ public class CandidateService implements Common<Candidate, Candidate, Long> {
         return repository.findAll(pageable);
     }
 
+    @Transactional
     public boolean vote(long id, List<Candidate> candidates) {
         Attendance attendance = attendanceService.show(id);
+        List<Candidate> candidateList = getCandidates(candidates);
         if (attendance.isAttend() && !attendance.isVoted()) {
-            candidates.forEach(c -> c.setTotalVotes(c.getTotalVotes().add(attendance.getNoOfShares())));
+            candidateList.forEach(c -> c.setTotalVotes(c.getTotalVotes().add(attendance.getNoOfShares())));
             attendance.setCandidates(candidates);
             attendance.setVoted(true);
             attendanceService.update(attendance.getId(), attendance);
@@ -81,6 +85,7 @@ public class CandidateService implements Common<Candidate, Candidate, Long> {
         throw new IllegalStateException("Shareholder not attend or already voted,");
     }
 
+    @Transactional
     public boolean reverseVote(long id) {
         Attendance attendance = attendanceService.show(id);
         if (attendance.isAttend() && attendance.isVoted()) {
@@ -97,12 +102,19 @@ public class CandidateService implements Common<Candidate, Candidate, Long> {
         return repository.findAllByCreatedBy(pageable, principal.getName());
     }
 
-    public JasperPrint exportReport(int noOfSelects, int reserve, String format){
+    public List<Candidate> getCandidates(List<Candidate> candidates) {
+        return repository.findByIdIn(candidates.stream()
+                .map(Candidate::getId)
+                .collect(Collectors.toList()))
+                .orElse(List.of());
+    }
+
+    public JasperPrint exportReport(int noOfSelects, int reserve, String format) {
         reportFiller.setReportFileName("Candidates.jrxml");
         reportFiller.compileReport();
-        HashMap<String,Object> parameters = new HashMap<>();
-        parameters.put("RESERVE",reserve);
-        parameters.put("NO_OF_SELECTE",noOfSelects);
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("RESERVE", reserve);
+        parameters.put("NO_OF_SELECTE", noOfSelects);
         reportFiller.setParameters(parameters);
         reportFiller.fillReport();
         return reportFiller.getJasperPrint();
