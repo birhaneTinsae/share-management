@@ -1,6 +1,7 @@
 package com.enat.sharemanagement.shareholder;
 
 import com.enat.sharemanagement.guardian.GuardianDTO;
+import com.enat.sharemanagement.share.ShareDTO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,4 +16,5 @@ public class ShareholderDTO extends Person implements Serializable {
     private MaritalStatus maritalStatus;
     private Status status;
     private List<GuardianDTO> guardian;
+    private List<ShareDTO> shares;
 }

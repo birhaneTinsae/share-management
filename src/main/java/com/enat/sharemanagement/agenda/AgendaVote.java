@@ -7,25 +7,25 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity(name="agenda_vote")
+@Entity(name = "agenda_vote")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AgendaVote {
     @EmbeddedId
-    AgendaVoteKey id;
+    private AgendaVoteKey id;
 
     @ManyToOne
     @MapsId("agendaId")
     @JoinColumn(name = "agenda_id")
-    Agenda agenda;
+    private Agenda agenda;
 
     @ManyToOne
     @MapsId("attendanceId")
     @JoinColumn(name = "attendance_id")
-    Attendance attendance;
+    private Attendance attendance;
 
-    int vote;
+    private int vote;
 
 }
 

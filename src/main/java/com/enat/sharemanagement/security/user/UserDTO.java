@@ -14,8 +14,8 @@ public class UserDTO implements Serializable {
     private long id;
     @NotNull(message="Username is required.")
     private String username;
-    @ValidPassword()
-    @NotNull(message="Password is mandatory")
+//    @ValidPassword()
+//    @NotNull(message="Password is mandatory")
     private String password;
     private String fullName;
     private List<RoleDTO> roles;

@@ -63,7 +63,7 @@ public class UserService implements Common<User, User,Long> {
             throw new UserAlreadyExistsException("There is an account with username '" + user.getUsername() + "'");
         }
         List<Role> roleList = null;
-        if (user.getRoles() != null && user.getRoles().size() > 0) {
+        if (user.getRoles() != null && !user.getRoles().isEmpty() ) {
             roleList = user.getRoles().stream().map(role -> roleService.show(role.getId()))
                     .collect(Collectors.toList());
             user.setRoles(roleList);
@@ -99,16 +99,7 @@ public class UserService implements Common<User, User,Long> {
 
     public User update(Long id, User userDto) {
         User user = show(id);
-//        if (userDto.getRoles() != null && userDto.getRoles().size() > 0) {
-//            List<Role> roleList = userDto.getRoles().stream().map(role -> roleService.show(role.getId()))
-//                    .collect(Collectors.toList());
-//            user.setRoles(roleList);
-//        } else {
-//            ArrayList<Role> roles = new ArrayList<>();
-//            Role role = roleService.getRoleByName("Reseller");
-//            roles.add(role);
-//            user.setRoles(roles);
-//        }
+
 
         user.setFullName(userDto.getFullName());
 

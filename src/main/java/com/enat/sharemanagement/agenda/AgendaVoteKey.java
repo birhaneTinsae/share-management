@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
+
 @Embeddable
 @Data
 @NoArgsConstructor
@@ -14,10 +15,10 @@ import java.io.Serializable;
 public class AgendaVoteKey implements Serializable {
 
     @Column(name = "agenda_id")
-    Long agendaId;
+    private Long agendaId;
 
     @Column(name = "attendance_id")
-    Long attendanceId;
+    private Long attendanceId;
 
     // standard constructors, getters, and setters
     // hashcode and equals implementation

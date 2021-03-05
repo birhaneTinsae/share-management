@@ -10,46 +10,49 @@
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="Arial" fontSize="12"/>
-	<parameter name="NO_OF_SELECTE" class="java.lang.Integer">
-		<defaultValueExpression><![CDATA[10]]></defaultValueExpression>
-	</parameter>
-	<parameter name="RESERVE" class="java.lang.Integer">
-		<defaultValueExpression><![CDATA[7]]></defaultValueExpression>
-	</parameter>
+	<parameter name="TOTAL_SELECTE" class="java.lang.Integer"/>
+	<parameter name="RESERVE" class="java.lang.Integer"/>
+<!--	<parameter name="LOGO" class="java.lang.String"/>-->
 	<queryString language="SQL">
-		<![CDATA[select * from candidates c left join shareholders s on
-c.shareholder_id=s.id]]>
+		<![CDATA[SELECT c.id,
+	a.first_name,
+	a.middle_name,
+	a.last_name,
+	c.total_votes
+FROM candidates c
+	left join attendance a ON 
+	 c.shareholder_id = a.id
+	 order by c.total_votes desc
+	 
+	]]>
 	</queryString>
 	<field name="id" class="java.lang.Long">
 		<property name="com.jaspersoft.studio.field.name" value="id"/>
 		<property name="com.jaspersoft.studio.field.label" value="id"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="candidates"/>
 	</field>
-	<field name="first_name_amharic" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="first_name_amharic"/>
-		<property name="com.jaspersoft.studio.field.label" value="first_name_amharic"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="shareholders"/>
+	<field name="first_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="first_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="first_name"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="attendance"/>
 	</field>
-	<field name="last_name_amharic" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="last_name_amharic"/>
-		<property name="com.jaspersoft.studio.field.label" value="last_name_amharic"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="shareholders"/>
+	<field name="middle_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="middle_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="middle_name"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="attendance"/>
 	</field>
-	<field name="middle_name_amharic" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="middle_name_amharic"/>
-		<property name="com.jaspersoft.studio.field.label" value="middle_name_amharic"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="shareholders"/>
+	<field name="last_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="last_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="last_name"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="attendance"/>
 	</field>
 	<field name="total_votes" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="total_votes"/>
 		<property name="com.jaspersoft.studio.field.label" value="total_votes"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="candidates"/>
 	</field>
-	<field name="no_of_shares" class="java.lang.Integer">
-		<property name="com.jaspersoft.studio.field.name" value="no_of_shares"/>
-		<property name="com.jaspersoft.studio.field.label" value="no_of_shares"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="shareholders"/>
-	</field>
+	<variable name="TOTAL_SELECTE" class="java.lang.Integer"/>
+	<variable name="RESERVE" class="java.lang.Integer"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -57,16 +60,16 @@ c.shareholder_id=s.id]]>
 		<band height="70" splitType="Stretch">
 <!--			<image>-->
 <!--				<reportElement x="275" y="0" width="300" height="64" uuid="363fa2ad-70fc-43cb-9062-e6c62c7f48fc"/>-->
-<!--				<imageExpression><![CDATA["leaf_banner_gray.png"]]></imageExpression>-->
+<!--				<imageExpression><![CDATA[$P{LOGO}]]></imageExpression>-->
 <!--			</image>-->
 			<staticText>
 				<reportElement style="Title" x="0" y="13" width="263" height="33" uuid="6f9c1004-6140-4588-9c4f-d75824835765"/>
 				<textElement verticalAlignment="Middle"/>
-				<text><![CDATA[Amhara Bank]]></text>
+				<text><![CDATA[Amhara Bank S.C.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="SubTitle" x="117" y="46" width="157" height="22" uuid="8e16dabd-2e54-471b-9652-83e1d55379ec"/>
-				<text><![CDATA[Candidates]]></text>
+				<reportElement style="SubTitle" x="117" y="46" width="263" height="22" uuid="8e16dabd-2e54-471b-9652-83e1d55379ec"/>
+				<text><![CDATA[Candidates Summary]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -74,7 +77,7 @@ c.shareholder_id=s.id]]>
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="36" splitType="Stretch">
+		<band height="39" splitType="Stretch">
 			<line>
 				<reportElement positionType="FixRelativeToBottom" x="0" y="35" width="555" height="1" uuid="544e89f7-0fd1-4142-aa23-e335e3be7007"/>
 				<graphicElement>
@@ -82,38 +85,26 @@ c.shareholder_id=s.id]]>
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement style="Column header" x="0" y="19" width="92" height="15" uuid="85b01936-4d57-4cf7-aa75-1429f6bd101c">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="90f2e971-7932-4787-9826-ac3b8e177ced"/>
+				<reportElement style="Column header" x="0" y="19" width="80" height="15" uuid="a0e13250-4ef6-4849-84b8-3b0e43a31b6b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a81960ad-ce4f-4305-b550-855fde13b70b"/>
 				</reportElement>
 				<text><![CDATA[id]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="92" y="19" width="92" height="15" uuid="69e706b5-ab32-4c4d-9354-46a0cb2da838">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5509b84a-6141-4aa0-a29a-51793b900d54"/>
+				<reportElement style="Column header" x="80" y="19" width="111" height="15" uuid="95d1d746-24d8-4b02-bab1-8d8fbf7b1ed3">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9c21bd71-2e47-4d44-8eb3-e5dd917388dc"/>
 				</reportElement>
-				<text><![CDATA[First name]]></text>
+				<text><![CDATA[Full name]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="184" y="19" width="92" height="15" uuid="b9dc89b5-d7de-439e-bcc5-95afeaa05d21">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58a1283-7e29-40e8-8417-f9f1f479ad5d"/>
-				</reportElement>
-				<text><![CDATA[Last name]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="276" y="19" width="92" height="15" uuid="6c269353-0f31-45a9-883a-46b2e46a85e5">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa98823a-20a7-4f5b-a274-2c8065f8d8de"/>
-				</reportElement>
-				<text><![CDATA[Middle name]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="368" y="19" width="92" height="15" uuid="616199b8-6325-48eb-a73a-b0eaa37c1f1e">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ad7c97d4-5981-4ffd-8d8e-23f2935568a6"/>
+				<reportElement style="Column header" x="309" y="19" width="111" height="15" uuid="67d0193e-9d2f-4ef5-960d-133c7d69991b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3cd19c35-c5fd-454f-b518-4449909b4db8"/>
 				</reportElement>
 				<text><![CDATA[Total votes]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="460" y="19" width="92" height="15" uuid="8934646c-4184-4fff-a1b9-47674e970419">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="843e2e7e-2fa1-49f2-a96d-8c02a76bb3b3"/>
+				<reportElement style="Column header" x="450" y="19" width="111" height="15" uuid="7cbee570-36f0-48f7-a001-b0b073417b0b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3cd19c35-c5fd-454f-b518-4449909b4db8"/>
 				</reportElement>
 				<text><![CDATA[Status]]></text>
 			</staticText>
@@ -121,6 +112,7 @@ c.shareholder_id=s.id]]>
 	</columnHeader>
 	<detail>
 		<band height="16" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<line>
 				<reportElement positionType="FixRelativeToBottom" x="0" y="15" width="555" height="1" uuid="cb229859-ab9a-4aa3-afa2-84439642f4ee"/>
 				<graphicElement>
@@ -128,40 +120,28 @@ c.shareholder_id=s.id]]>
 				</graphicElement>
 			</line>
 			<textField>
-				<reportElement style="Detail" x="0" y="0" width="92" height="15" uuid="d48e8741-0131-4f22-ba71-bbf9b4ea92be">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="90f2e971-7932-4787-9826-ac3b8e177ced"/>
+				<reportElement style="Detail" x="0" y="0" width="80" height="15" uuid="637a9c59-33c5-40c6-860f-bba28de062f1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a81960ad-ce4f-4305-b550-855fde13b70b"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Detail" x="92" y="0" width="92" height="15" uuid="1f2e40b0-f744-4960-a24c-97513f163a69">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5509b84a-6141-4aa0-a29a-51793b900d54"/>
+				<reportElement style="Detail" x="80" y="0" width="229" height="15" uuid="1b48dd2e-a7dc-4454-85d3-ec3fc1b1c144">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="9c21bd71-2e47-4d44-8eb3-e5dd917388dc"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{first_name_amharic}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[CONCATENATE($F{first_name}," ",$F{middle_name}," ",$F{last_name})]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Detail" x="184" y="0" width="92" height="15" uuid="889a5f63-a35d-4311-af6d-f47c95c625a1">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b58a1283-7e29-40e8-8417-f9f1f479ad5d"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{middle_name_amharic}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement style="Detail" x="276" y="0" width="92" height="15" uuid="8fa1a820-29ec-40d1-b655-30a79ab9091a">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa98823a-20a7-4f5b-a274-2c8065f8d8de"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{last_name_amharic}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement style="Detail" x="368" y="0" width="92" height="15" uuid="72742e37-4d12-4b73-914d-bf6be2789a8c">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ad7c97d4-5981-4ffd-8d8e-23f2935568a6"/>
+				<reportElement style="Detail" x="309" y="0" width="111" height="15" uuid="8266d51b-2c67-4ecf-ba54-ef83dbc3cc8e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3cd19c35-c5fd-454f-b518-4449909b4db8"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{total_votes}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="Detail" x="460" y="0" width="92" height="15" uuid="0c40b0c9-e72d-4c32-b708-ed1b1a627c86">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="843e2e7e-2fa1-49f2-a96d-8c02a76bb3b3"/>
+				<reportElement style="Detail" x="450" y="0" width="111" height="15" uuid="906e667a-0947-4410-8c2f-2fcd9eb6262f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3cd19c35-c5fd-454f-b518-4449909b4db8"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$V{REPORT_COUNT}< $P{NO_OF_SELECTE}?  $V{REPORT_COUNT}< $P{RESERVE}? "SELECTED":"RESERVED":""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[IF($V{REPORT_COUNT}<=$P{TOTAL_SELECTE},IF($V{REPORT_COUNT}>($P{TOTAL_SELECTE}-$P{RESERVE}),"RESERVE","SELECTED"),"NOT SELECTED")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

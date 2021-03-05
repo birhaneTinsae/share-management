@@ -3,14 +3,23 @@ package com.enat.sharemanagement.agenda;
 import com.enat.sharemanagement.attendance.Attendance;
 import com.enat.sharemanagement.attendance.AttendanceService;
 import com.enat.sharemanagement.exceptions.EntityNotFoundException;
+import com.enat.sharemanagement.report.SimpleReportExporter;
+import com.enat.sharemanagement.report.SimpleReportFiller;
+import com.enat.sharemanagement.utils.ApplicationProps;
 import com.enat.sharemanagement.utils.Common;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.xml.JRPrintXmlLoader;
 import org.springframework.beans.BeanUtils;
+import org.springframework.boot.actuate.liquibase.LiquibaseEndpoint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.enat.sharemanagement.utils.Util.getNullPropertyNames;
@@ -21,6 +30,9 @@ public class AgendaService implements Common<Agenda, Agenda, Long> {
     private final AgendaRepository agendaRepository;
     private final AttendanceService attendanceService;
     private final AgendaVoteRepository agendaVoteRepository;
+    private final SimpleReportFiller reportFiller;
+    private final SimpleReportExporter reportExporter;
+    private final ApplicationProps applicationProps;
 
     @Override
     public Agenda store(@Valid Agenda agenda) {
@@ -68,6 +80,31 @@ public class AgendaService implements Common<Agenda, Agenda, Long> {
     }
 
     public List<AgendaSummary> getAgendaSummery() {
-        return agendaRepository.getAgendaSummary().orElse(List.of());
+        return agendaRepository.getAgendaSummary()
+                .orElse(List.of());
     }
+
+    public JasperPrint exportReport() {
+        reportFiller.setReportFileName("Agenda.jrxml");
+        HashMap<String, Object> parameters = new HashMap<>();
+        reportFiller.setParameters(parameters);
+        reportFiller.prepareReport();
+        return reportFiller.getJasperPrint();
+    }
+
+    public void exportReportToXlxs(OutputStream outputStream) {
+        reportExporter.setJasperPrint(exportReport());
+        reportExporter.exportToXlsx(applicationProps.getAuthor(),outputStream);
+    }
+
+    public void exportReportToCsv(OutputStream outputStream) {
+        reportExporter.setJasperPrint(exportReport());
+        reportExporter.exportToCsv(outputStream);
+    }
+
+    public void exportReportToHtml(OutputStream outputStream) {
+        reportExporter.setJasperPrint(exportReport());
+        reportExporter.exportToHtml(outputStream);
+    }
+
 }

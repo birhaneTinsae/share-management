@@ -69,14 +69,13 @@ public class UserController implements Common<UserDTO, UserResponseDTO,Long> {
     @Operation(summary = "User password Reset endpoint", security = @SecurityRequirement(name = "basicAuth"))
     @PutMapping("/password-reset")
     public UserResponseDTO passwordReset(@RequestBody UserPasswordDTO user) {
-
         return dtoMapper(userService.passwordRest(user), UserResponseDTO.class,modelMapper);
     }
 
     @Operation(summary = "Create User", security = @SecurityRequirement(name = "basicAuth"))
     @Override
     public UserResponseDTO store(@Valid UserDTO userDto) {
-        User user = dtoMapper(userDto, User.class, modelMapper);
+        var user = dtoMapper(userDto, User.class, modelMapper);
         return dtoMapper(userService.store(user), UserResponseDTO.class, modelMapper);
     }
 
@@ -92,7 +91,7 @@ public class UserController implements Common<UserDTO, UserResponseDTO,Long> {
 
     @Override
     public UserResponseDTO update(Long id, @Valid UserDTO userDto) {
-        User user = userService.update(id, dtoMapper(userDto, User.class, modelMapper));
+        var user = userService.update(id, dtoMapper(userDto, User.class, modelMapper));
         return dtoMapper(user, UserResponseDTO.class, modelMapper);
     }
 
@@ -100,8 +99,6 @@ public class UserController implements Common<UserDTO, UserResponseDTO,Long> {
     public boolean delete(Long id) {
         return userService.delete(id);
     }
-
-
 
     @Override
     public Iterable<UserResponseDTO> getAll(Pageable pageable) {

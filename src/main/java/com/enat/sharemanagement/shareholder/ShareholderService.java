@@ -1,8 +1,9 @@
 package com.enat.sharemanagement.shareholder;
 
 import com.enat.sharemanagement.exceptions.EntityNotFoundException;
-import com.enat.sharemanagement.guardian.Guardian;
 import com.enat.sharemanagement.guardian.GuardianRepository;
+import com.enat.sharemanagement.share.Share;
+import com.enat.sharemanagement.share.ShareService;
 import com.enat.sharemanagement.utils.Common;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -15,17 +16,18 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static com.enat.sharemanagement.utils.Util.getNullPropertyNames;
+import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
 public class ShareholderService implements Common<Shareholder, Shareholder, Long> {
     private final ShareholderRepository repository;
     private final GuardianRepository guardianRepository;
+    private final ShareService shareService;
 
     @Override
     public Shareholder store(@Valid Shareholder shareholder) {
-        if (shareholder.getGuardian()!=null) {
-
+        if (!isNull(shareholder.getGuardian())) {
             shareholder = repository.save(shareholder);
             @Valid Shareholder finalShareholder = shareholder;
 
@@ -44,7 +46,8 @@ public class ShareholderService implements Common<Shareholder, Shareholder, Long
 
     @Override
     public Shareholder show(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(Shareholder.class, "ID", String.valueOf(id)));
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Shareholder.class, "ID", String.valueOf(id)));
     }
 
     @Override
@@ -65,7 +68,14 @@ public class ShareholderService implements Common<Shareholder, Shareholder, Long
         return repository.findAll(pageable);
     }
 
-    public Page<Shareholder> search(Specification<Shareholder> spec,Pageable pageable) {
-        return repository.findAll(spec,pageable);
+    public Page<Shareholder> search(Specification<Shareholder> spec, Pageable pageable) {
+        return repository.findAll(spec, pageable);
+    }
+
+    public Shareholder addShare(long id, Share share) {
+        var shareholder = show(id);
+        share.setShareholder(shareholder);
+        shareService.store(share);
+        return show(id);
     }
 }

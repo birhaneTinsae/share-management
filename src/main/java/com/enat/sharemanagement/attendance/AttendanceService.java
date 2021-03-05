@@ -1,26 +1,20 @@
 package com.enat.sharemanagement.attendance;
 
-import com.enat.sharemanagement.attendance.log.AttendanceLog;
-import com.enat.sharemanagement.attendance.log.AttendanceLogRepository;
 import com.enat.sharemanagement.exceptions.EntityNotFoundException;
 import com.enat.sharemanagement.report.SimpleReportExporter;
 import com.enat.sharemanagement.report.SimpleReportFiller;
-import com.enat.sharemanagement.shareholder.Shareholder;
-import com.enat.sharemanagement.shareholder.ShareholderRepository;
 import com.enat.sharemanagement.utils.ApplicationProps;
 import com.enat.sharemanagement.utils.Common;
-import com.enat.sharemanagement.vote.*;
+import com.enat.sharemanagement.vote.AttendanceMetric;
 import lombok.RequiredArgsConstructor;
 import net.sf.jasperreports.engine.JasperPrint;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
-import java.io.InputStream;
-import java.math.BigDecimal;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,10 +24,6 @@ import static com.enat.sharemanagement.utils.Util.getNullPropertyNames;
 @RequiredArgsConstructor
 public class AttendanceService implements Common<Attendance, Attendance, Long> {
     private final AttendanceRepository attendanceRepository;
-    private final ShareholderRepository shareholderRepository;
-    private final AttendanceLogRepository attendanceLogRepository;
-    private final CandidateLogRepository candidateLogRepository;
-    private final CandidateRepository candidateRepository;
     private final SimpleReportFiller reportFiller;
     private final SimpleReportExporter reportExporter;
     private final ApplicationProps applicationProps;
@@ -87,44 +77,44 @@ public class AttendanceService implements Common<Attendance, Attendance, Long> {
         return attendanceRepository.attendanceMetric(true);
     }
 
-    @Transactional
-    public boolean createAttendance(AttendanceDTO a) {
-        Iterable<Shareholder> shareholders = shareholderRepository.findAll();
-        Iterable<Attendance> attendances = attendanceRepository.findAll();
-        Iterable<Candidate> candidates = candidateRepository.findAll();
+//    @Transactional
+//    public boolean createAttendance(AttendanceDTO a) {
+//        Iterable<Shareholder> shareholders = shareholderRepository.findAll();
+//        Iterable<Attendance> attendances = attendanceRepository.findAll();
+//        Iterable<Candidate> candidates = candidateRepository.findAll();
+//
+//        for (Candidate candidate : candidates) {
+//            var candidateLog = new CandidateLog();
+////            candidateLog.setShareholder(candidate.getShareholder());
+//            candidateLog.setTotalVotes(candidate.getTotalVotes());
+//            candidateLog.setId(candidate.getId());
+//            candidateLogRepository.save(candidateLog);
+//            candidateRepository.delete(candidate);
+//        }
+//
+//        for (Attendance attendance : attendances) {
+//            AttendanceLog attendanceLog = new AttendanceLog();
+//            attendanceLog.setId(attendance.getId());
+//            attendanceLog.setShareholder(attendance.getShareholder());
+//            attendanceLog.setAttend(attendance.isAttend());
+//            attendanceLog.setVoted(attendance.isVoted());
+//            attendanceLog.setBudgetYear(attendance.getBudgetYear());
+//            attendanceLogRepository.save(attendanceLog);
+//            attendanceRepository.delete(attendance);
+//        }
+//        for (Shareholder shareholder : shareholders) {
+//            Attendance attendance = new Attendance();
+//            attendance.setBudgetYear(a.getBudgetYear());
+//            attendance.setShareholder(shareholder);
+//            attendance.setNoOfShares(BigDecimal.valueOf(shareholder.getNoOfShares()));
+//            attendance.setId(shareholder.getId());
+//            attendanceRepository.save(attendance);
+//
+//        }
+//        return true;
+//    }
 
-        for (Candidate candidate : candidates) {
-            var candidateLog = new CandidateLog();
-//            candidateLog.setShareholder(candidate.getShareholder());
-            candidateLog.setTotalVotes(candidate.getTotalVotes());
-            candidateLog.setId(candidate.getId());
-            candidateLogRepository.save(candidateLog);
-            candidateRepository.delete(candidate);
-        }
-
-        for (Attendance attendance : attendances) {
-            AttendanceLog attendanceLog = new AttendanceLog();
-            attendanceLog.setId(attendance.getId());
-            attendanceLog.setShareholder(attendance.getShareholder());
-            attendanceLog.setAttend(attendance.isAttend());
-            attendanceLog.setVoted(attendance.isVoted());
-            attendanceLog.setBudgetYear(attendance.getBudgetYear());
-            attendanceLogRepository.save(attendanceLog);
-            attendanceRepository.delete(attendance);
-        }
-        for (Shareholder shareholder : shareholders) {
-            Attendance attendance = new Attendance();
-            attendance.setBudgetYear(a.getBudgetYear());
-            attendance.setShareholder(shareholder);
-            attendance.setNoOfShares(BigDecimal.valueOf(shareholder.getNoOfShares()));
-            attendance.setId(shareholder.getId());
-            attendanceRepository.save(attendance);
-
-        }
-        return true;
-    }
-
-    public JasperPrint exportReport(boolean attend, String format) {
+    public JasperPrint exportReport(boolean attend) {
         reportFiller.setReportFileName("Attendance.jrxml");
         reportFiller.compileReport();
         HashMap<String, Object> parameters = new HashMap<>();
@@ -132,5 +122,20 @@ public class AttendanceService implements Common<Attendance, Attendance, Long> {
         reportFiller.setParameters(parameters);
         reportFiller.fillReport();
         return reportFiller.getJasperPrint();
+    }
+
+    public void exportReportToXlxs(boolean attend, OutputStream outputStream){
+        reportExporter.setJasperPrint(exportReport(attend));
+        reportExporter.exportToXlsx(applicationProps.getAuthor(),outputStream);
+    }
+
+    public void exportReportToCsv(boolean attend, OutputStream outputStream) {
+        reportExporter.setJasperPrint(exportReport(attend));
+        reportExporter.exportToCsv(outputStream);
+    }
+
+    public void exportReportToHtml(boolean attend, OutputStream outputStream) {
+        reportExporter.setJasperPrint(exportReport(attend));
+        reportExporter.exportToHtml(outputStream);
     }
 }

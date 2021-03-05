@@ -5,6 +5,7 @@ import com.enat.sharemanagement.transaction.TransactionTypeConverter;
 import com.enat.sharemanagement.shareholder.Shareholder;
 import com.enat.sharemanagement.utils.Auditable;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity(name="share_ledger")
+@EqualsAndHashCode(callSuper = true)
 public class ShareLedger extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

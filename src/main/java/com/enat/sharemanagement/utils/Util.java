@@ -22,13 +22,7 @@ public class Util {
                 .toArray(String[]::new);
     }
 
-    public static BigDecimal getDailyIncrement(double noOfDays, LocalDate effectiveDate) {
-        long dates = ChronoUnit.DAYS.between(LocalDate.of(effectiveDate.getYear(),
-                Month.JUNE,
-                30),
-                effectiveDate);
-        return BigDecimal.valueOf(noOfDays / dates);
-    }
+
 
     public static <S, T> List<T> mapList(List<S> source, Class<T> targetClass, ModelMapper modelMapper) {
         return source.stream()

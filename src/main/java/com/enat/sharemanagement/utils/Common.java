@@ -34,15 +34,7 @@ public interface Common<T, Z,Y> {
     @DeleteMapping(value = "/{id}", produces = {"application/json"})
     boolean delete(@PathVariable Y id);
 
-    /**
-     * @return
-     */
-//    @GetMapping("/")
-//    Iterable<Z> getAll();
     @GetMapping(value = "/all", produces = {"application/json"})
     Iterable<Z> getAll(Pageable pageable);
 
-//    @GetMapping("/search")
-//    @Nullable
-//    Iterable<Z> search(@RequestParam(value = "search") String searchQuery);
 }

@@ -1,10 +1,10 @@
 package com.enat.sharemanagement.batch;
 
-import com.enat.sharemanagement.attendance.AttendanceRepository;
 import com.enat.sharemanagement.shareholder.Shareholder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,14 +13,11 @@ import java.util.List;
 @Log4j2
 @RequiredArgsConstructor
 public class AttendanceItemWriter implements ItemWriter<Shareholder> {
-    private final AttendanceRepository repository;
 
 
     @Override
-    public void write(List<? extends Shareholder> list) throws Exception {
+    public void write(List<? extends Shareholder>   list) {
         log.info(getClass().getName(), "writing to the database");
-        //  repository.saveAll(list);
-        System.out.println(list.size());
         log.info(getClass().getName(), "writing to the database completed");
 
     }

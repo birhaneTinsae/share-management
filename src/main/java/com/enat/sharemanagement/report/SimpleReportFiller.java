@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.util.JRSaver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -40,9 +41,15 @@ public class SimpleReportFiller {
 
     public void compileReport() {
         try {
+//            if (new ClassPathResource("reports/".concat(reportFileName.replace(".jrxml", ".jasper"))).exists()) {
+//             log.debug("not recompiled");
+//
+//                return;
+//            }
+
             InputStream reportStream = getClass().getResourceAsStream("/reports/".concat(reportFileName));
             jasperReport = JasperCompileManager.compileReport(reportStream);
-            JRSaver.saveObject(jasperReport, reportFileName.replace(".jrxml", ".jasper"));
+            JRSaver.saveObject(jasperReport, "src/main/resources/reports/"+reportFileName.replace(".jrxml", ".jasper"));
         } catch (JRException ex) {
             log.fatal("Failed to compile report",ex);
         }

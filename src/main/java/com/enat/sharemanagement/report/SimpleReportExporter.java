@@ -14,6 +14,8 @@ import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.*;
 import org.springframework.stereotype.Component;
 
+import java.io.OutputStream;
+
 @Component
 @Log4j2
 @Data
@@ -75,11 +77,11 @@ public class SimpleReportExporter {
         }
     }
 
-    public void exportToXlsx(String fileName, String sheetName) {
+    public void exportToXlsx(String sheetName, OutputStream outputStream) {
         JRXlsxExporter exporter = new JRXlsxExporter();
 
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(fileName));
+        exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
 
         SimpleXlsxReportConfiguration reportConfig = new SimpleXlsxReportConfiguration();
         reportConfig.setSheetNames(new String[] { sheetName });
@@ -93,24 +95,25 @@ public class SimpleReportExporter {
         }
     }
 
-    public void exportToCsv(String fileName) {
+    public void exportToCsv(OutputStream outputStream) {
         JRCsvExporter exporter = new JRCsvExporter();
 
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        exporter.setExporterOutput(new SimpleWriterExporterOutput(fileName));
+        exporter.setExporterOutput(new SimpleWriterExporterOutput(outputStream));
 
         try {
             exporter.exportReport();
         } catch (JRException ex) {
             log.fatal("Failed to export csv report",ex);
         }
+
     }
 
-    public void exportToHtml(String fileName) {
+    public void exportToHtml(OutputStream outputStream) {
         HtmlExporter exporter = new HtmlExporter();
 
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        exporter.setExporterOutput(new SimpleHtmlExporterOutput(fileName));
+        exporter.setExporterOutput(new SimpleHtmlExporterOutput(outputStream));
 
         try {
             exporter.exportReport();

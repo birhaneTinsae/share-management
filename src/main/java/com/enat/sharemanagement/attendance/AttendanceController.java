@@ -1,5 +1,6 @@
 package com.enat.sharemanagement.attendance;
 
+import com.enat.sharemanagement.security.IsAdmin;
 import com.enat.sharemanagement.utils.Common;
 import com.enat.sharemanagement.utils.PaginatedResultsRetrievedEvent;
 import com.enat.sharemanagement.vote.AttendanceMetric;
@@ -94,15 +95,16 @@ public class AttendanceController implements Common<Attendance, AttendanceDTO, L
         return dtoMapper(attendanceService.reverseAttendance(id), AttendanceDTO.class, modelMapper);
     }
 
-    @PostMapping("/create")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public boolean createAttendance(@RequestBody AttendanceDTO attendance){
-        return attendanceService.createAttendance(attendance);
-    }
+//    @PostMapping("/create")
+//    @ResponseStatus(HttpStatus.ACCEPTED)
+//    public boolean createAttendance(@RequestBody AttendanceDTO attendance){
+//        return attendanceService.createAttendance(attendance);
+//    }
 
+    @IsAdmin
     @GetMapping("/metrics")
     public AttendanceMetricsDTO attendanceMetric() {
-        return dtoMapper(attendanceService.attendanceMetric(),AttendanceMetricsDTO.class,modelMapper);
+        return dtoMapper(attendanceService.attendanceMetric(), AttendanceMetricsDTO.class, modelMapper);
     }
 
 

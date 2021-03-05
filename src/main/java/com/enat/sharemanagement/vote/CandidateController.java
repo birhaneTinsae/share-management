@@ -1,5 +1,6 @@
 package com.enat.sharemanagement.vote;
 
+import com.enat.sharemanagement.security.IsAdmin;
 import com.enat.sharemanagement.utils.Common;
 import com.enat.sharemanagement.utils.PaginatedResultsRetrievedEvent;
 import com.enat.sharemanagement.validation.MaxSizeConstraint;
@@ -33,6 +34,7 @@ public class CandidateController implements Common<CandidateDTO, CandidateDTO, L
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
 
+    @IsAdmin
     @Override
     public CandidateDTO store(@Valid CandidateDTO candidateDTO) {
         return dtoMapper(service.store(dtoMapper(candidateDTO, Candidate.class, modelMapper)), CandidateDTO.class, modelMapper);
@@ -48,16 +50,19 @@ public class CandidateController implements Common<CandidateDTO, CandidateDTO, L
         return dtoMapper(service.show(id), CandidateDTO.class, modelMapper);
     }
 
+    @IsAdmin
     @Override
     public CandidateDTO update(Long id, @Valid CandidateDTO candidateDTO) {
         return dtoMapper(service.update(id, dtoMapper(candidateDTO, Candidate.class, modelMapper)), CandidateDTO.class, modelMapper);
     }
 
+    @IsAdmin
     @Override
     public boolean delete(Long id) {
         return service.delete(id);
     }
 
+    @IsAdmin
     @GetMapping
     public ResponseEntity<PagedModel<CandidateDTO>> getAll(@Parameter(description = "pagination object",
             schema = @Schema(implementation = Pageable.class))
@@ -73,7 +78,7 @@ public class CandidateController implements Common<CandidateDTO, CandidateDTO, L
 
     @Override
     public Iterable<CandidateDTO> getAll(Pageable pageable) {
-      throw new UnsupportedOperationException("Not implemented yet.");
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @PutMapping("/vote/{shareholderId}")
@@ -100,7 +105,7 @@ public class CandidateController implements Common<CandidateDTO, CandidateDTO, L
 
     @PutMapping("/reverse/{id}")
     @Transactional
-    public boolean reverseVote(@PathVariable int id) {
+    public boolean reverseVote(@PathVariable long id) {
         return service.reverseVote(id);
     }
 

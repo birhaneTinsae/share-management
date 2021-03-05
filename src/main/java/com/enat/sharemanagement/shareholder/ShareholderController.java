@@ -2,6 +2,7 @@ package com.enat.sharemanagement.shareholder;
 
 import com.enat.sharemanagement.guardian.Guardian;
 import com.enat.sharemanagement.guardian.GuardianDTO;
+import com.enat.sharemanagement.share.Share;
 import com.enat.sharemanagement.utils.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static com.enat.sharemanagement.utils.Util.dtoMapper;
 import static com.enat.sharemanagement.utils.Util.mapList;
+import static java.util.Objects.isNull;
 
 @RestController
 @RequestMapping("/shareholders")
@@ -40,14 +42,15 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
 
+
     @Override
     public ShareholderDTO store(@Valid ShareholderDTO shareholderDTO) {
         log.info("Create new shareholder");
-        if (Period.between(shareholderDTO.getDob(), LocalDate.now()).getYears() < 18 && shareholderDTO.getGuardian() == null) {
+        if (Period.between(shareholderDTO.getDob(), LocalDate.now()).getYears() < 18 && isNull(shareholderDTO.getGuardian())) {
             throw new IllegalArgumentException("Shareholder below age of 18 should have guardian");
         }
         Shareholder shareholder = dtoMapper(shareholderDTO, Shareholder.class, modelMapper);
-        if (shareholderDTO.getGuardian() != null) {
+        if (!isNull(shareholderDTO.getGuardian())) {
             List<Guardian> guardians = mapList(shareholderDTO.getGuardian(), Guardian.class, modelMapper);
             shareholder.setGuardian(guardians);
         }
@@ -105,6 +108,10 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
 //    public ResponseEntity<> issueCertificate(){
 //
 //    }
+    @PostMapping("/share/{id}")
+    public ShareholderDTO addShare(@PathVariable("id") long id,@RequestBody Share share){
+        return dtoMapper(service.addShare(id,share),ShareholderDTO.class,modelMapper);
+    }
 
     @GetMapping("/search")
     public ResponseEntity<PagedModel<ShareholderDTO>> search(@Parameter(description = "pagination object",
@@ -122,11 +129,10 @@ public class ShareholderController implements Common<ShareholderDTO, Shareholder
     }
 
     public ShareholderDTO getShareholderDTO(Shareholder shareholder) {
-        ShareholderDTO shareholderDTO = dtoMapper(shareholder, ShareholderDTO.class, modelMapper);
-        if (shareholder.getGuardian() != null) {
+        var shareholderDTO = dtoMapper(shareholder, ShareholderDTO.class, modelMapper);
+        if (!isNull(shareholder.getGuardian())) {
             shareholderDTO.setGuardian(mapList(shareholder.getGuardian(), GuardianDTO.class, modelMapper));
         }
-
         return shareholderDTO;
     }
 

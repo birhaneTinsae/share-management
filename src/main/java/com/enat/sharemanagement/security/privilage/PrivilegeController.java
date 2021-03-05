@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -34,6 +35,7 @@ import static com.enat.sharemanagement.utils.Util.dtoMapper;
 @RequestMapping("privileges")
 @Tag(name = "Privilege", description = "Privilege API")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class PrivilegeController implements Common<Privilege, PrivilegeDTO, Long> {
     private final PrivilegeService privilegeService;
     private final ApplicationEventPublisher eventPublisher;

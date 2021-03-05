@@ -1,5 +1,9 @@
 
 spring:
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
   application:
     name: "Share Management System"
   jpa:
@@ -10,6 +14,9 @@ spring:
     url: jdbc:mysql://${MYSQL_HOST:10.1.12.110}:3306/share_management
     username: atmuser
     password: Pas@12345
+  flyway:
+    baseline-on-migrate : true
+    enabled: true
 jwt:
   secret: ${SECRET_KEY}
 application:
@@ -21,4 +28,15 @@ application:
 storage:
   location: ""
 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 

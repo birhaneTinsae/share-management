@@ -1,7 +1,6 @@
 package com.enat.sharemanagement.agenda;
 
-import com.enat.sharemanagement.attendance.Attendance;
-import com.enat.sharemanagement.attendance.AttendanceDTO;
+import com.enat.sharemanagement.security.IsAdmin;
 import com.enat.sharemanagement.utils.Common;
 import com.enat.sharemanagement.utils.PaginatedResultsRetrievedEvent;
 import com.google.common.collect.Lists;
@@ -33,12 +32,13 @@ public class AgendaController implements Common<AgendaDTO, AgendaDTO, Long> {
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
 
+    @IsAdmin
     @Override
     public AgendaDTO store(@Valid AgendaDTO agendaDTO) {
-
         return dtoMapper(agendaService.store(dtoMapper(agendaDTO, Agenda.class, modelMapper)), AgendaDTO.class, modelMapper);
     }
 
+    @IsAdmin
     @Override
     public Iterable<AgendaDTO> store(List<@Valid AgendaDTO> t) {
         List<Agenda> agendas = Lists.newArrayList(agendaService.store(mapList(t, Agenda.class, modelMapper)));
@@ -50,11 +50,13 @@ public class AgendaController implements Common<AgendaDTO, AgendaDTO, Long> {
         return dtoMapper(agendaService.show(id), AgendaDTO.class, modelMapper);
     }
 
+    @IsAdmin
     @Override
     public AgendaDTO update(Long id, @Valid AgendaDTO agendaDTO) {
         return dtoMapper(agendaService.update(id, dtoMapper(agendaDTO, Agenda.class, modelMapper)), AgendaDTO.class, modelMapper);
     }
 
+    @IsAdmin
     @Override
     public boolean delete(Long id) {
         return agendaService.delete(id);
@@ -71,7 +73,7 @@ public class AgendaController implements Common<AgendaDTO, AgendaDTO, Long> {
             , final HttpServletResponse response) {
         eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<>(
                 AgendaDTO.class, uriBuilder, response, pageable.getPageNumber(), agendaService.getAll(pageable).getTotalPages(), pageable.getPageSize()));
-        return new ResponseEntity<PagedModel<AgendaDTO>>(assembler.toModel(agendaService.getAll(pageable).map(a->dtoMapper(a,AgendaDTO.class,modelMapper))), HttpStatus.OK);
+        return new ResponseEntity<PagedModel<AgendaDTO>>(assembler.toModel(agendaService.getAll(pageable).map(a -> dtoMapper(a, AgendaDTO.class, modelMapper))), HttpStatus.OK);
 
     }
 
@@ -85,8 +87,9 @@ public class AgendaController implements Common<AgendaDTO, AgendaDTO, Long> {
         return dtoMapper(agendaService.vote(agendaId, attendanceId, vote), AgendaVoteDTO.class, modelMapper);
     }
 
+    @IsAdmin
     @GetMapping("/summary")
-    public List<AgendaSummaryDTO> getAgendaSummary(){
-        return mapList(agendaService.getAgendaSummery(),AgendaSummaryDTO.class,modelMapper);
+    public List<AgendaSummaryDTO> getAgendaSummary() {
+        return mapList(agendaService.getAgendaSummery(), AgendaSummaryDTO.class, modelMapper);
     }
 }

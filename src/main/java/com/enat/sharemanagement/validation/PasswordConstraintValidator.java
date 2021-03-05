@@ -9,7 +9,9 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
+    @Override
     public void initialize(ValidPassword constraint) {
+        throw new UnsupportedOperationException();
     }
 
     public boolean isValid(String password, ConstraintValidatorContext context) {

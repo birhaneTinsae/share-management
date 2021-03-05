@@ -1,7 +1,9 @@
 package com.enat.sharemanagement.security;
 
 import com.enat.sharemanagement.security.user.UserRepository;
+import com.enat.sharemanagement.security.user.UserService;
 import com.enat.sharemanagement.utils.ApplicationProps;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,11 +24,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsServiceImp;
@@ -34,31 +38,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final RestAccessDeniedHandler accessDeniedHandler;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-//    @Value("${allowed.origin}")
-//    public List<String> allowedOrigin;
     private final ApplicationProps applicationProps;
 
-    public SecurityConfig(MyBasicAuthenticationEntryPoint authenticationEntryPoint,
-                          UserDetailsService userDetailsServiceImp,
-                          RestAccessDeniedHandler accessDeniedHandler,
-                          JwtUtil jwtUtil, UserRepository userRepository, ApplicationProps applicationProps) {
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.userDetailsServiceImp = userDetailsServiceImp;
-        this.accessDeniedHandler = accessDeniedHandler;
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.applicationProps = applicationProps;
-    }
-
-
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authProvider());
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**","/shareholders/QRCode/**","/reports/**");
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/swagger-ui/**", "/actuator/**",
+                "/v3/api-docs/**", "/shareholders/QRCode/**", "/reports/**");
     }
 
     @Bean
@@ -85,7 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilter(new MyAuthenticationFilter(authenticationManager(), userRepository, jwtUtil))
                 .addFilter(new MyAuthorizationFilter(authenticationManager(), jwtUtil, userDetailsServiceImp));
-
 
 
     }
@@ -116,10 +105,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        return source;
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(applicationProps.getAllowedOrigin());
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH","PROPFIND"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH", "PROPFIND"));
         configuration.setAllowedHeaders(Arrays.asList("X-XSRF-TOKEN", "X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"/*,"Access-Control-Allow-Origin","Access-Control-Allow-Headers"*/));
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
